@@ -2,27 +2,21 @@ import React from 'react';
 import moment from 'moment';
 
 const EXPLANATION = (
-    <>
-        {'Are your friends all playing Wordle and sending you their'}
+    <div className='explanation'>
+        Are your friends all playing Wordle and sending you their annoying emoji
+        squares all the time?
         <br />
-        {'annoying emoji squares all the time?'}
-        <br />
-        {"Wish you could participate, but you can't be bothered to"}
-        <br />
-        {'actually play Wordle for the 15th time?'}
+        Wish you could participate, but you can't be bothered to actually play
+        Wordle for the 15th time?
         <br />
         <br />
-        {`Now your troubles are over.`}
+        Now your troubles are over.
         <br />
         <br />
-        {'Simply choose your desired skill level and Fraudle will'}
-        <br />
-        {'generate an annoying emoji square that you can copy and'}
-        <br />
-        {'paste anywhere you like to share your meaningless'}
-        <br />
-        {'"accomplishment" with the world.'}
-    </>
+        Simply choose your desired skill level and Fraudle will generate an
+        annoying emoji square that you can copy and paste anywhere you like to
+        share your meaningless "accomplishment" with the world.
+    </div>
 );
 
 const YELLOW = '🟨';
