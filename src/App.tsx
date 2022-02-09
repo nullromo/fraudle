@@ -1,6 +1,30 @@
 import React from 'react';
 import moment from 'moment';
 
+const EXPLANATION = (
+    <>
+        {'Are your friends all playing Wordle and sending you their'}
+        <br />
+        {'annoying emoji squares all the time?'}
+        <br />
+        {"Wish you could participate, but you can't be bothered to"}
+        <br />
+        {'actually play Wordle for the 15th time?'}
+        <br />
+        <br />
+        {`Now your troubles are over.`}
+        <br />
+        <br />
+        {'Simply choose your desired skill level and Fraudle will'}
+        <br />
+        {'generate an annoying emoji square that you can copy and'}
+        <br />
+        {'paste anywhere you like to share your meaningless'}
+        <br />
+        {'"accomplishment" with the world.'}
+    </>
+);
+
 const YELLOW = '🟨';
 const GREEN = '🟩';
 const GRAY = '⬜';
@@ -74,8 +98,10 @@ export class App extends React.Component<EmptyProps, AppState> {
     public readonly render = () => {
         return (
             <>
-                Choose your skill level
+                <div>{EXPLANATION}</div>
                 <br />
+                <br />
+                Skill level:{' '}
                 <select
                     onChange={(event) => {
                         this.setState({
@@ -91,11 +117,17 @@ export class App extends React.Component<EmptyProps, AppState> {
                     <option value={6}>I'm bad at Wordle</option>
                 </select>
                 <br />
+                <br />
                 <button type='button' onClick={this.generate}>
                     Play
                 </button>
                 <br />
-                <textarea value={this.state.output} rows={9}></textarea>
+                <br />
+                <textarea
+                    value={this.state.output}
+                    cols={16}
+                    rows={9}
+                ></textarea>
                 <div hidden={!this.state.output}>
                     Nice work. Now tell all your friends.
                 </div>
