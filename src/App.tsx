@@ -3,19 +3,19 @@ import moment from 'moment';
 
 const EXPLANATION = (
     <div className='explanation'>
-        Are your friends all playing Wordle and sending you their annoying emoji
-        squares all the time?
+        Are your friends all playing Wordle and sending you their emoji squares
+        all the time?
         <br />
-        Wish you could participate, but you can't be bothered to actually play
-        Wordle for the 15th time?
+        Do you wish you could participate, but you can't be bothered to actually
+        play Wordle?
         <br />
         <br />
         Now your troubles are over.
         <br />
         <br />
         Simply choose your desired skill level and Fraudle will generate an
-        annoying emoji square that you can copy and paste anywhere you like to
-        share your meaningless "accomplishment" with the world.
+        emoji square that you can copy and paste anywhere you like to share your
+        "accomplishment" with the world.
     </div>
 );
 
