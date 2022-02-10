@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/fraudle/static/css/main.ba35d7cf.css",
+    "main.js": "/fraudle/static/js/main.ef5fc6e1.js",
+    "index.html": "/fraudle/index.html",
+    "main.ba35d7cf.css.map": "/fraudle/static/css/main.ba35d7cf.css.map",
+    "main.ef5fc6e1.js.map": "/fraudle/static/js/main.ef5fc6e1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ba35d7cf.css",
+    "static/js/main.ef5fc6e1.js"
+  ]
+}
