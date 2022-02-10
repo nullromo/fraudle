@@ -90,8 +90,8 @@ export class App extends React.Component<EmptyProps, AppState> {
     };
 
     public readonly render = () => {
-        return (
-            <>
+        const mainContent = (
+            <div>
                 <div>{EXPLANATION}</div>
                 <br />
                 <br />
@@ -124,6 +124,15 @@ export class App extends React.Component<EmptyProps, AppState> {
                 ></textarea>
                 <div hidden={!this.state.output}>
                     Nice work. Now tell all your friends.
+                </div>
+            </div>
+        );
+
+        return (
+            <>
+                <div className='main'>{mainContent}</div>
+                <div className='footer'>
+                    © 2022 Kyle Kovacs ALL RIGHTS RESERVED
                 </div>
             </>
         );

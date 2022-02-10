@@ -1,3 +1,16 @@
+.main {
+    display: flex;
+    justify-content: center;
+}
+
 .explanation {
     width: 340px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    width: 100%;
+    text-align: center;
 }
