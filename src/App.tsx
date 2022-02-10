@@ -1,10 +1,190 @@
 import React from 'react';
 import moment from 'moment';
 
+const YELLOW = '🟨';
+const GREEN = '🟩';
+const GRAY = '⬜';
+
+const assertUnreachable = (_: never): never => {
+    throw new Error('This error is impossible.');
+};
+
+type Letter = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+/*
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 16
+    | 17
+    | 18
+    | 19
+    | 20
+    | 21
+    | 22
+    | 23
+    | 24
+    | 25
+    | 26*/
+
+const randomLetter = () => {
+    const LETTERS: Letter[] = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10 /*11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26,*/,
+    ];
+    return LETTERS[Math.floor(Math.random() * LETTERS.length)];
+};
+
+type Word = [Letter, Letter, Letter, Letter, Letter];
+
+enum LetterResult {
+    LOCKED_IN,
+    RIGHT,
+    WRONG,
+}
+
+type WordResult = [
+    LetterResult,
+    LetterResult,
+    LetterResult,
+    LetterResult,
+    LetterResult,
+];
+
+const generateRandomWord = () => {
+    return [...Array(5)].map((_) => {
+        return randomLetter();
+    }) as Word;
+};
+
+class WordleGame {
+    private answer: Word;
+
+    private guesses: Word[] = [];
+
+    private results: WordResult[] = [];
+
+    public constructor(private readonly hardMode: boolean) {
+        this.answer = generateRandomWord();
+    }
+
+    private readonly analyzeGuess = (guess: Word) => {
+        let answerCopy: Array<Letter | null> = [...this.answer];
+        return guess.map((letter, position) => {
+            if (letter === answerCopy[position]) {
+                answerCopy[position] = null;
+                return LetterResult.LOCKED_IN;
+            }
+            const index = answerCopy.findIndex((answerLetter) => {
+                return answerLetter === letter;
+            });
+            if (index !== -1) {
+                answerCopy[index] = null;
+                return LetterResult.RIGHT;
+            }
+            return LetterResult.WRONG;
+        }) as WordResult;
+    };
+
+    private readonly addGuess = (guess: Word) => {
+        this.guesses.push(guess);
+        this.results.push(this.analyzeGuess(guess));
+    };
+
+    private readonly guess = () => {
+        if (this.guesses.length === 0) {
+            this.addGuess(generateRandomWord());
+            return;
+        }
+        const previousGuess = this.guesses[this.guesses.length - 1];
+        const previousResult = this.results[this.results.length - 1];
+        if (this.hardMode) {
+            const checkHardMode = (nextGuess: Word) => {
+                const nextResult = this.analyzeGuess(nextGuess);
+                return previousResult.every((letterResult, position) => {
+                    const previousLetter = previousGuess[position];
+                    switch (letterResult) {
+                        case LetterResult.LOCKED_IN:
+                            return (
+                                nextResult[position] === LetterResult.LOCKED_IN
+                            );
+                        case LetterResult.RIGHT:
+                            return nextGuess.some((nextLetter) => {
+                                return nextLetter === previousLetter;
+                            });
+                        case LetterResult.WRONG:
+                            return true;
+                        default:
+                            return assertUnreachable(letterResult);
+                    }
+                });
+            };
+            let nextGuess: Word;
+            let tries = 0;
+            do {
+                tries += 1;
+                nextGuess = generateRandomWord();
+            } while (tries < 1_000_000 && !checkHardMode(nextGuess));
+            if (tries > 1_000_000) {
+                throw new Error('Took too many tries');
+            }
+            this.addGuess(nextGuess);
+            return;
+        }
+        this.addGuess(generateRandomWord());
+    };
+
+    private readonly win = () => {
+        this.addGuess(this.answer);
+    };
+
+    private readonly isGameValid = () => {
+        return !this.results.slice(0, -1).some((result) => {
+            return result.every((letterResult) => {
+                return letterResult === LetterResult.LOCKED_IN;
+            });
+        });
+    };
+
+    private readonly reset = () => {
+        this.guesses = [];
+        this.results = [];
+    };
+
+    public readonly play = (selectedLevel: number) => {
+        do {
+            this.reset();
+            [...Array(selectedLevel - 1).keys()].forEach((_) => {
+                this.guess();
+            });
+            this.win();
+        } while (!this.isGameValid());
+    };
+
+    public readonly toString = () => {
+        return this.guesses.map((guess) => {
+            return this.analyzeGuess(guess).map((letterResult) => {
+                switch (letterResult) {
+                    case LetterResult.LOCKED_IN:
+                        return GREEN;
+                    case LetterResult.RIGHT:
+                        return YELLOW;
+                    case LetterResult.WRONG:
+                        return GRAY;
+                    default:
+                        return assertUnreachable(letterResult);
+                }
+            });
+        });
+    };
+}
+
 const EXPLANATION = (
     <div className='explanation'>
         Are your friends all playing Wordle and sending you their emoji squares
         all the time?
+        <br />
         <br />
         Do you wish you could participate, but you can't be bothered to actually
         play Wordle?
@@ -19,65 +199,8 @@ const EXPLANATION = (
     </div>
 );
 
-const YELLOW = '🟨';
-const GREEN = '🟩';
-const GRAY = '⬜';
-
 type EmptyProps = Record<string, unknown>;
 //type EmptyState = Record<string, never>;
-
-const generateGrid = (selectedLevel: number, hardMode: boolean) => {
-    const isRowValid = (row: string[]) => {
-        if (
-            row.every((square) => {
-                return square === GREEN;
-            })
-        ) {
-            return false;
-        }
-        let greens = 0;
-        let yellows = 0;
-        row.forEach((square) => {
-            if (square === GREEN) {
-                greens += 1;
-            }
-            if (square === YELLOW) {
-                yellows += 1;
-            }
-        });
-        if (greens === 4 && yellows === 1) {
-            return false;
-        }
-        return true;
-    };
-    const grid = [...Array(selectedLevel)].map((_, i) => {
-        const grayThreshold = 0.6 - i * 0.1;
-        const yellowThreshold = 0.9 - i * 0.1;
-        const chooseColor = () => {
-            const randomNumber = Math.random();
-            if (randomNumber < grayThreshold) {
-                return GRAY;
-            }
-            if (randomNumber < yellowThreshold) {
-                return YELLOW;
-            }
-            return GREEN;
-        };
-        let row;
-        do {
-            row = [
-                chooseColor(),
-                chooseColor(),
-                chooseColor(),
-                chooseColor(),
-                chooseColor(),
-            ];
-        } while (!isRowValid(row));
-        return row;
-    });
-    grid[selectedLevel - 1] = [GREEN, GREEN, GREEN, GREEN, GREEN];
-    return grid;
-};
 
 interface AppState {
     copied: boolean | null;
@@ -98,10 +221,9 @@ export class App extends React.Component<EmptyProps, AppState> {
     }
 
     private readonly generate = () => {
-        const grid = generateGrid(
-            this.state.selectedLevel,
-            this.state.hardMode,
-        );
+        const game = new WordleGame(this.state.hardMode);
+        game.play(this.state.selectedLevel);
+        const grid = game.toString();
         const gridText = grid
             .map((line) => {
                 return line.join('');
@@ -110,7 +232,9 @@ export class App extends React.Component<EmptyProps, AppState> {
         const output = `Wordle ${moment().diff(
             moment('20210619', 'YYYYMMDD'),
             'days',
-        )} ${this.state.selectedLevel}/6\n\n${gridText}`;
+        )} ${this.state.selectedLevel}/6${
+            this.state.hardMode ? '*' : ''
+        }\n\n${gridText}`;
         this.setState({ output });
     };
 
@@ -171,6 +295,9 @@ export class App extends React.Component<EmptyProps, AppState> {
                     value={this.state.output}
                     cols={16}
                     rows={3 + this.state.selectedLevel}
+                    onChange={() => {
+                        // do nothing
+                    }}
                 ></textarea>
                 <br />
                 <div className='copy-button-container'>
