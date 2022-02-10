@@ -80,6 +80,8 @@ const generateGrid = (selectedLevel: number, hardMode: boolean) => {
 };
 
 interface AppState {
+    copied: boolean | null;
+    hardMode: boolean;
     output: string;
     selectedLevel: number;
 }
@@ -88,23 +90,11 @@ export class App extends React.Component<EmptyProps, AppState> {
     public constructor(props: EmptyProps) {
         super(props);
         this.state = {
+            copied: null,
+            hardMode: false,
             output: '',
             selectedLevel: 3,
         };
-    }
-
-    private readonly copyToClipboard = () => {
-        if (window.isSecureContext) {
-            navigator.clipboard
-                .writeText(
-                    this.state.output
-                )
-                .catch((error) => {
-                    console.log(error);
-                });
-        } else {
-            console.error('Cannot copy to clipboard.');
-        }
     }
 
     private readonly generate = () => {
@@ -127,6 +117,7 @@ export class App extends React.Component<EmptyProps, AppState> {
     public readonly render = () => {
         const mainContent = (
             <div>
+                <h1>Fraudle</h1>
                 <div>{EXPLANATION}</div>
                 <br />
                 <br />
@@ -134,7 +125,9 @@ export class App extends React.Component<EmptyProps, AppState> {
                 <select
                     onChange={(event) => {
                         this.setState({
+                            copied: null,
                             selectedLevel: Number(event.target.value),
+                            output: '',
                         });
                     }}
                     value={this.state.selectedLevel}
@@ -146,21 +139,70 @@ export class App extends React.Component<EmptyProps, AppState> {
                     <option value={6}>I'm bad at Wordle</option>
                 </select>
                 <br />
+                <label>
+                    <input
+                        type='checkbox'
+                        onChange={(event) => {
+                            this.setState({
+                                copied: null,
+                                hardMode: event.target.checked,
+                                output: '',
+                            });
+                        }}
+                        checked={this.state.hardMode}
+                    />
+                    My friends think "hard mode" counts for something
+                </label>
                 <br />
-                <button type='button' onClick={this.generate}>
+                <br />
+                <button
+                    type='button'
+                    onClick={() => {
+                        this.generate();
+                        this.setState({ copied: null });
+                    }}
+                >
                     Play
                 </button>
                 <br />
                 <br />
                 <textarea
+                    hidden={!this.state.output}
                     value={this.state.output}
                     cols={16}
-                    rows={9}
+                    rows={3 + this.state.selectedLevel}
                 ></textarea>
                 <br />
-                <button hidden={!this.state.output} type='button' onClick={this.copyToClipboard}>
-                    Copy To Clipboard
-                </button>
+                <div className='copy-button-container'>
+                    <button
+                        hidden={!this.state.output}
+                        type='button'
+                        onClick={async () => {
+                            if (window.isSecureContext) {
+                                await navigator.clipboard
+                                    .writeText(this.state.output)
+                                    .then(() => {
+                                        this.setState({ copied: true });
+                                    })
+                                    .catch((error) => {
+                                        this.setState({ copied: false });
+                                        console.error(
+                                            'Cannot copy to clipboard.',
+                                        );
+                                        console.log(error);
+                                    });
+                            } else {
+                                console.error('Cannot copy to clipboard.');
+                                this.setState({ copied: false });
+                            }
+                        }}
+                    >
+                        Copy To Clipboard
+                    </button>
+                    <div hidden={this.state.copied === null}>
+                        {this.state.copied ? '✔️' : '❌'}
+                    </div>
+                </div>
                 <div hidden={!this.state.output}>
                     Nice work. Now tell all your friends.
                 </div>
