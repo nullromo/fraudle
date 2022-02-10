@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/fraudle/static/css/main.b2e36dff.css",
-    "main.js": "/fraudle/static/js/main.d303774c.js",
+    "main.css": "/fraudle/static/css/main.214cec8d.css",
+    "main.js": "/fraudle/static/js/main.a1e806db.js",
     "index.html": "/fraudle/index.html",
-    "main.b2e36dff.css.map": "/fraudle/static/css/main.b2e36dff.css.map",
-    "main.d303774c.js.map": "/fraudle/static/js/main.d303774c.js.map"
+    "main.214cec8d.css.map": "/fraudle/static/css/main.214cec8d.css.map",
+    "main.a1e806db.js.map": "/fraudle/static/js/main.a1e806db.js.map"
   },
   "entrypoints": [
-    "static/css/main.b2e36dff.css",
-    "static/js/main.d303774c.js"
+    "static/css/main.214cec8d.css",
+    "static/js/main.a1e806db.js"
   ]
 }
