@@ -26,6 +26,59 @@ const GRAY = '⬜';
 type EmptyProps = Record<string, unknown>;
 //type EmptyState = Record<string, never>;
 
+const generateGrid = (selectedLevel: number, hardMode: boolean) => {
+    const isRowValid = (row: string[]) => {
+        if (
+            row.every((square) => {
+                return square === GREEN;
+            })
+        ) {
+            return false;
+        }
+        let greens = 0;
+        let yellows = 0;
+        row.forEach((square) => {
+            if (square === GREEN) {
+                greens += 1;
+            }
+            if (square === YELLOW) {
+                yellows += 1;
+            }
+        });
+        if (greens === 4 && yellows === 1) {
+            return false;
+        }
+        return true;
+    };
+    const grid = [...Array(selectedLevel)].map((_, i) => {
+        const grayThreshold = 0.6 - i * 0.1;
+        const yellowThreshold = 0.9 - i * 0.1;
+        const chooseColor = () => {
+            const randomNumber = Math.random();
+            if (randomNumber < grayThreshold) {
+                return GRAY;
+            }
+            if (randomNumber < yellowThreshold) {
+                return YELLOW;
+            }
+            return GREEN;
+        };
+        let row;
+        do {
+            row = [
+                chooseColor(),
+                chooseColor(),
+                chooseColor(),
+                chooseColor(),
+                chooseColor(),
+            ];
+        } while (!isRowValid(row));
+        return row;
+    });
+    grid[selectedLevel - 1] = [GREEN, GREEN, GREEN, GREEN, GREEN];
+    return grid;
+};
+
 interface AppState {
     output: string;
     selectedLevel: number;
@@ -55,42 +108,10 @@ export class App extends React.Component<EmptyProps, AppState> {
     }
 
     private readonly generate = () => {
-        const grid = [...Array(this.state.selectedLevel)].map((_, i) => {
-            const grayThreshold = 0.6 - i * 0.1;
-            const yellowThreshold = 0.9 - i * 0.1;
-            const chooseColor = () => {
-                const randomNumber = Math.random();
-                if (randomNumber < grayThreshold) {
-                    return GRAY;
-                }
-                if (randomNumber < yellowThreshold) {
-                    return YELLOW;
-                }
-                return GREEN;
-            };
-            let row;
-            do {
-                row = [
-                    chooseColor(),
-                    chooseColor(),
-                    chooseColor(),
-                    chooseColor(),
-                    chooseColor(),
-                ];
-            } while (
-                row.every((square) => {
-                    return square === GREEN;
-                })
-            );
-            return row;
-        });
-        grid[this.state.selectedLevel - 1] = [
-            GREEN,
-            GREEN,
-            GREEN,
-            GREEN,
-            GREEN,
-        ];
+        const grid = generateGrid(
+            this.state.selectedLevel,
+            this.state.hardMode,
+        );
         const gridText = grid
             .map((line) => {
                 return line.join('');
