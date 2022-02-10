@@ -40,6 +40,20 @@ export class App extends React.Component<EmptyProps, AppState> {
         };
     }
 
+    private readonly copyToClipboard = () => {
+        if (window.isSecureContext) {
+            navigator.clipboard
+                .writeText(
+                    this.state.output
+                )
+                .catch((error) => {
+                    console.log(error);
+                });
+        } else {
+            console.error('Cannot copy to clipboard.');
+        }
+    }
+
     private readonly generate = () => {
         const grid = [...Array(this.state.selectedLevel)].map((_, i) => {
             const grayThreshold = 0.6 - i * 0.1;
@@ -122,6 +136,10 @@ export class App extends React.Component<EmptyProps, AppState> {
                     cols={16}
                     rows={9}
                 ></textarea>
+                <br />
+                <button hidden={!this.state.output} type='button' onClick={this.copyToClipboard}>
+                    Copy To Clipboard
+                </button>
                 <div hidden={!this.state.output}>
                     Nice work. Now tell all your friends.
                 </div>
